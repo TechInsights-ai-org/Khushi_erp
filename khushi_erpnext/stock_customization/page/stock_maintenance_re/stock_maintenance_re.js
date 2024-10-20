@@ -8,13 +8,18 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     // Create Filter Section
     let filter_fields = [
         {fieldname: "warehouse", label: "Warehouse", fieldtype: "Link", options: 'Warehouse'},
-        {fieldname: "rack", label: "Rack", fieldtype: "Link",options:'Rack'},
+        {fieldname: "rack", label: "Rack", fieldtype: "Link", options: 'Rack'},
         {fieldname: "item_group", label: "Item Group", fieldtype: "Link", options: "Item Group"},
         {fieldname: "brand", label: "Brand", fieldtype: "Link", options: "Brand"},
-        {fieldname: "year", label: "Year", fieldtype: "Link",options:'Year'},
-        {fieldname: "subject", label: "Subject", fieldtype: "Link",options:'Subject'},
-        {fieldname: "status", label: "Status", fieldtype: "Select", options: ["All", "Continue","SemiContinue","Discontinue"]},
-        {fieldname: "season", label: "Season", fieldtype: "Link",options:'Item Segment'},
+        {fieldname: "year", label: "Year", fieldtype: "Link", options: 'Year'},
+        {fieldname: "subject", label: "Subject", fieldtype: "Link", options: 'Subject'},
+        {
+            fieldname: "status",
+            label: "Status",
+            fieldtype: "Select",
+            options: ["All", "Continue", "SemiContinue", "Discontinue"]
+        },
+        {fieldname: "season", label: "Season", fieldtype: "Link", options: 'Item Segment'},
         {fieldname: "item", label: "Item", fieldtype: "Link", options: "Item"}
     ];
 
@@ -25,14 +30,20 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             label: field.label,
             fieldtype: field.fieldtype,
             options: field.options || '',
-            change: function() {
+            change: function () {
                 update_dashboard();
             }
         });
     });
 
-    let grid_container = $('<div></div>').appendTo(page.body);
-    // Function to Fetch and Update Dashboard based on Filters
+    // Create the grid container
+    let grid_container = $('<div></div>').css({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',  // Dynamically adjust to fit the screen size
+        gap: '20px',
+        marginTop: '20px',
+    }).appendTo(page.body);
+
     function update_dashboard() {
         let filters = {
             warehouse: page.fields_dict.warehouse.get_value(),
@@ -45,67 +56,168 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             season: page.fields_dict.season.get_value(),
             item: page.fields_dict.item.get_value(),
         };
-        console.log(filters)
+        console.log(filters);
         frappe.call({
-            method: 'frappe.client.get_list',
+            method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
             args: {
-                doctype: 'Stock Ledger Entry',
                 filters: filters,
-                fields: ['item_code', 'warehouse', 'brand', 'stock_qty'],
             },
-            callback: function(r) {
+            callback: function (r) {
                 if (r.message) {
-                    // Here, update your dashboard with the filtered data
+                    // Clear the grid before updating
+                    grid_container.empty();
                     display_report_data(r.message);
                 }
             }
         });
     }
 
-     function reset_filters() {
-            filter_fields.forEach(function (field) {
-                page.fields_dict[field.fieldname].set_value('');
-            });
-            update_dashboard();  // Refresh dashboard without filters
-        }
+    function reset_filters() {
+        filter_fields.forEach(function (field) {
+            page.fields_dict[field.fieldname].set_value('');
+        });
+        update_dashboard();  // Refresh dashboard without filters
+    }
 
-        page.add_button('Reset Filters', reset_filters);
+    page.add_button('Reset Filters', reset_filters);
 
     function display_report_data(items) {
-            // Create grid structure and display items
-            items.forEach(function(item) {
-                let item_div = $('<div class="item-container"></div>').css({
-                    display: 'inline-block',
-                    width: '150px',
-                    padding: '10px',
-                    textAlign: 'center',
-                    border: '1px solid #ddd',
-                    margin: '10px'
-                }).appendTo(grid_container);
+        // Iterate over each item and display it in the grid
+        items.forEach(function (item) {
+            let item_div = $('<div class="item-container"></div>').css({
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '15px',
+                textAlign: 'center',
+                border: '1px solid #ddd',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #e3f2fd, #fce4ec)', // Attractive gradient background
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'pointer',
+                marginBottom: '20px' // Extra spacing between rows
+            }).hover(
+                function () {
+                    // On hover, slightly enlarge the item and add a stronger shadow
+                    $(this).css({
+                        transform: 'scale(1.05)',
+                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+                    });
+                },
+                function () {
+                    // Reset the size and shadow when hover is removed
+                    $(this).css({
+                        transform: 'scale(1)',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    });
+                }
+            ).appendTo(grid_container);
 
-                // Item Image
-                let img = $('<img>').attr('src', item.image || 'placeholder-image-url.png') // fallback to a placeholder image if no image is available
-                                    .css({ width: '100px', height: '100px', objectFit: 'cover' })
-                                    .appendTo(item_div);
+            // Item Image
+            let img = $('<img>').attr('src', item.custom_image_template || 'placeholder-image-url.png')
+                .css({
+                    width: '160px',
+                    height: '100px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    marginBottom: '10px'
+                }).appendTo(item_div);
 
-                // Item Code / Name
-                $('<div></div>').text(item.item_code || 'No Item Code')
-                                .css({ fontWeight: 'bold', margin: '10px 0' })
-                                .appendTo(item_div);
+            // Item Code / Name
+            $('<div></div>').text(item.item_code || 'No Item Code')
+                .css({
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    marginBottom: '8px',
+                    color: '#333' // Darker text for contrast
+                }).appendTo(item_div);
 
-                // Item description or any other detail
-                $('<div></div>').text(item.item_description || 'No description available')
-                                .css({ fontSize: '12px', color: '#666' })
-                                .appendTo(item_div);
+            // Item description
+            $('<div></div>').text(item.item_description || 'No description available')
+                .css({
+                    fontSize: '12px',
+                    color: '#666',
+                    marginBottom: '8px'
+                }).appendTo(item_div);
 
-                // Any other fields like quantity, warehouse, etc.
-                $('<div></div>').text(`Stock Qty: ${item.stock_qty || 'N/A'}`)
-                                .css({ fontSize: '12px', color: '#333' })
-                                .appendTo(item_div);
-            });
-        }
+            // Stock Quantity
+            $('<div></div>').text(`Stock Qty: ${item.stock_qty || 'N/A'}`)
+                .css({
+                    fontSize: '12px',
+                    color: '#333'
+                }).appendTo(item_div);
+        });
+    }
+     update_dashboard();
+}
 
-        // Initial load of the dashboard
-        update_dashboard();
-
-    };
+//     function display_report_data(items) {
+//         // Iterate over each item and display it in the grid
+//         items.forEach(function(item) {
+//             let item_div = $('<div class="item-container"></div>').css({
+//                 display: 'flex',
+//                 flexDirection: 'column',
+//                 alignItems: 'center',
+//                 padding: '15px',
+//                 textAlign: 'center',
+//                 border: '1px solid #ddd',
+//                 borderRadius: '8px',
+//                 backgroundColor: '#fff',
+//                 transition: 'transform 0.2s, box-shadow 0.2s',
+//                 cursor: 'pointer'
+//             }).hover(
+//                 function() {
+//                     // On hover, slightly enlarge the item and add shadow
+//                     $(this).css({
+//                         transform: 'scale(1.05)',
+//                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+//                     });
+//                 },
+//                 function() {
+//                     // Reset the size and shadow when hover is removed
+//                     $(this).css({
+//                         transform: 'scale(1)',
+//                         boxShadow: 'none'
+//                     });
+//                 }
+//             ).appendTo(grid_container);
+//
+//             // Item Image
+//             let img = $('<img>').attr('src', item.custom_image_template || 'placeholder-image-url.png')
+//                                 .css({
+//                                     width: '100px',
+//                                     height: '100px',
+//                                     objectFit: 'cover',
+//                                     borderRadius: '4px',
+//                                     marginBottom: '10px'
+//                                 }).appendTo(item_div);
+//
+//             // Item Code / Name
+//             $('<div></div>').text(item.item_code || 'No Item Code')
+//                             .css({
+//                                 fontWeight: 'bold',
+//                                 fontSize: '14px',
+//                                 marginBottom: '8px'
+//                             }).appendTo(item_div);
+//
+//             // Item description
+//             $('<div></div>').text(item.item_description || 'No description available')
+//                             .css({
+//                                 fontSize: '12px',
+//                                 color: '#666',
+//                                 marginBottom: '8px'
+//                             }).appendTo(item_div);
+//
+//             // Stock Quantity
+//             $('<div></div>').text(`Stock Qty: ${item.stock_qty || 'N/A'}`)
+//                             .css({
+//                                 fontSize: '12px',
+//                                 color: '#333'
+//                             }).appendTo(item_div);
+//         });
+//     }
+//
+//     // Initial load of the dashboard
+//     update_dashboard();
+// };
