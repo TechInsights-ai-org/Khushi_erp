@@ -56,7 +56,6 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             season: page.fields_dict.season.get_value(),
             item: page.fields_dict.item.get_value(),
         };
-        console.log(filters);
         frappe.call({
             method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
             args: {
@@ -64,7 +63,6 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             },
             callback: function (r) {
                 if (r.message) {
-                    // Clear the grid before updating
                     grid_container.empty();
                     display_report_data(r.message);
                 }
@@ -76,13 +74,13 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         filter_fields.forEach(function (field) {
             page.fields_dict[field.fieldname].set_value('');
         });
-        update_dashboard();  // Refresh dashboard without filters
+        update_dashboard();
     }
 
     page.add_button('Reset Filters', reset_filters);
 
     function display_report_data(items) {
-        // Iterate over each item and display it in the grid
+
         items.forEach(function (item) {
             let item_div = $('<div class="item-container"></div>').css({
                 display: 'flex',
@@ -92,11 +90,11 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 textAlign: 'center',
                 border: '1px solid #ddd',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #e3f2fd, #fce4ec)', // Attractive gradient background
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+                background: 'linear-gradient(135deg, #e3f2fd, #fce4ec)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 cursor: 'pointer',
-                marginBottom: '20px' // Extra spacing between rows
+                marginBottom: '20px'
             }).hover(
                 function () {
                     // On hover, slightly enlarge the item and add a stronger shadow
@@ -115,7 +113,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             ).appendTo(grid_container);
 
             // Item Image
-            let img = $('<img>').attr('src', item.custom_image_template || 'placeholder-image-url.png')
+            let img = $('<img>').attr('src', item.image || 'placeholder-image-url.png')
                 .css({
                     width: '160px',
                     height: '100px',
