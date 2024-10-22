@@ -62,10 +62,9 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 filters: filters,
             },
             callback: function (r) {
-                if (r.message) {
-                    grid_container.empty();
-                    display_report_data(r.message);
-                }
+                grid_container.empty();
+                display_report_data(r.message);
+
             }
         });
     }
@@ -80,6 +79,18 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     page.add_button('Reset Filters', reset_filters);
 
     function display_report_data(items) {
+        if (!items || items.length === 0) {
+        $('<div>No data found</div>')
+            .css({
+                textAlign: 'center',
+                padding: '20px',
+                color: '#666',
+                fontSize: '16px',
+                fontStyle: 'italic'
+            })
+            .appendTo(grid_container);
+        return;
+    }
 
         items.forEach(function (item) {
             let item_div = $('<div class="item-container"></div>').css({
@@ -123,7 +134,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Item Code / Name
-            $('<div></div>').text(item.item_code || 'No Item Code')
+            $('<div></div>').text(`Item: ${item.item || 'No Item Code'}`)
                 .css({
                     fontWeight: 'bold',
                     fontSize: '14px',
@@ -132,7 +143,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Item description
-            $('<div></div>').text(item.item_description || 'No description available')
+            $('<div></div>').text(`Rack: ${item.rack || 'No description available'}`)
                 .css({
                     fontSize: '12px',
                     color: '#666',
@@ -140,7 +151,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Stock Quantity
-            $('<div></div>').text(`Stock Qty: ${item.stock_qty || 'N/A'}`)
+            $('<div></div>').text(`Stock Qty: ${item.qty || 'N/A'}`)
                 .css({
                     fontSize: '12px',
                     color: '#333'
