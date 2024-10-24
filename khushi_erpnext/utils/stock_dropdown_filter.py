@@ -49,7 +49,6 @@ def get_inward_dropdown_list(doctype: str, txt: str, searchfield: str, filters: 
     if txt:
         cond_list.append(f" {searchfield} LIKE \"%{txt}%\" ")
     cond: str = "WHERE" + "AND".join(cond_list) if cond_list else ""
-    print("---------------------------------", cond)
     return frappe.db.sql(f"""SELECT name From `tab{doctype}` {cond}""")
 
 
