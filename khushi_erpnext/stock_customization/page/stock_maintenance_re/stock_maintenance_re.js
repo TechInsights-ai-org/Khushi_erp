@@ -8,7 +8,6 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     // Create Filter Section
     let filter_fields = [
         {fieldname: "warehouse", label: "Warehouse", fieldtype: "Link", options: 'Warehouse'},
-        {fieldname: "rack", label: "Rack", fieldtype: "Link", options: 'Rack'},
         {fieldname: "item_group", label: "Item Group", fieldtype: "Link", options: "Item Group"},
         {fieldname: "brand", label: "Brand", fieldtype: "Link", options: "Brand"},
         {fieldname: "year", label: "Year", fieldtype: "Link", options: 'Year'},
@@ -47,7 +46,6 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     function update_dashboard() {
         let filters = {
             warehouse: page.fields_dict.warehouse.get_value(),
-            rack: page.fields_dict.rack.get_value(),
             item_group: page.fields_dict.item_group.get_value(),
             brand: page.fields_dict.brand.get_value(),
             year: page.fields_dict.year.get_value(),
@@ -143,7 +141,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Item description
-            $('<div></div>').text(`Rack: ${item.rack || 'No description available'}`)
+            $('<div></div>').text(`Item Group: ${item.item_group || 'N/A'}`)
                 .css({
                     fontSize: '12px',
                     color: '#666',
@@ -151,7 +149,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Stock Quantity
-            $('<div></div>').text(`Stock Qty: ${item.qty || 'N/A'}`)
+            $('<div></div>').text(`Total Qty: ${item.qty || '0'}`)
                 .css({
                     fontSize: '12px',
                     color: '#333'
@@ -161,72 +159,3 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
      update_dashboard();
 }
 
-//     function display_report_data(items) {
-//         // Iterate over each item and display it in the grid
-//         items.forEach(function(item) {
-//             let item_div = $('<div class="item-container"></div>').css({
-//                 display: 'flex',
-//                 flexDirection: 'column',
-//                 alignItems: 'center',
-//                 padding: '15px',
-//                 textAlign: 'center',
-//                 border: '1px solid #ddd',
-//                 borderRadius: '8px',
-//                 backgroundColor: '#fff',
-//                 transition: 'transform 0.2s, box-shadow 0.2s',
-//                 cursor: 'pointer'
-//             }).hover(
-//                 function() {
-//                     // On hover, slightly enlarge the item and add shadow
-//                     $(this).css({
-//                         transform: 'scale(1.05)',
-//                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-//                     });
-//                 },
-//                 function() {
-//                     // Reset the size and shadow when hover is removed
-//                     $(this).css({
-//                         transform: 'scale(1)',
-//                         boxShadow: 'none'
-//                     });
-//                 }
-//             ).appendTo(grid_container);
-//
-//             // Item Image
-//             let img = $('<img>').attr('src', item.custom_image_template || 'placeholder-image-url.png')
-//                                 .css({
-//                                     width: '100px',
-//                                     height: '100px',
-//                                     objectFit: 'cover',
-//                                     borderRadius: '4px',
-//                                     marginBottom: '10px'
-//                                 }).appendTo(item_div);
-//
-//             // Item Code / Name
-//             $('<div></div>').text(item.item_code || 'No Item Code')
-//                             .css({
-//                                 fontWeight: 'bold',
-//                                 fontSize: '14px',
-//                                 marginBottom: '8px'
-//                             }).appendTo(item_div);
-//
-//             // Item description
-//             $('<div></div>').text(item.item_description || 'No description available')
-//                             .css({
-//                                 fontSize: '12px',
-//                                 color: '#666',
-//                                 marginBottom: '8px'
-//                             }).appendTo(item_div);
-//
-//             // Stock Quantity
-//             $('<div></div>').text(`Stock Qty: ${item.stock_qty || 'N/A'}`)
-//                             .css({
-//                                 fontSize: '12px',
-//                                 color: '#333'
-//                             }).appendTo(item_div);
-//         });
-//     }
-//
-//     // Initial load of the dashboard
-//     update_dashboard();
-// };
