@@ -12,14 +12,10 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         {fieldname: "brand", label: "Brand", fieldtype: "Link", options: "Brand"},
         {fieldname: "year", label: "Year", fieldtype: "Link", options: 'Year'},
         {fieldname: "subject", label: "Subject", fieldtype: "Link", options: 'Subject'},
-        {
-            fieldname: "status",
-            label: "Status",
-            fieldtype: "Select",
-            options: ["All", "Continue", "SemiContinue", "Discontinue"]
-        },
+        {fieldname: "status", label: "Status", fieldtype: "Select", options: ["","Continue", "SemiContinue", "Discontinue"]},
         {fieldname: "season", label: "Season", fieldtype: "Link", options: 'Item Segment'},
-        {fieldname: "item", label: "Item", fieldtype: "Link", options: "Item"}
+        {fieldname: "item", label: "Item", fieldtype: "Link", options: "Item"},
+        {fieldname: "qty", label: "Qty Greater than", fieldtype: "Int", defualt:0}
     ];
 
     // Initialize Filters
@@ -53,6 +49,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             status: page.fields_dict.status.get_value(),
             season: page.fields_dict.season.get_value(),
             item: page.fields_dict.item.get_value(),
+            qty: page.fields_dict.qty.get_value()
         };
         frappe.call({
             method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
