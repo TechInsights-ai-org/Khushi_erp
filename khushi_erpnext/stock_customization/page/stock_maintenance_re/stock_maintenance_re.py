@@ -6,6 +6,14 @@ from erpnext.stock.doctype.warehouse.test_warehouse import get_warehouse
 
 
 def get_condition(filters: dict) -> str:
+    """
+    Constructs a SQL condition string based on the provided filters.
+    Args:
+        filters (dict): Dictionary containing filter keys and values for filtering the items.
+    Returns:
+        str: A SQL condition string that adds filters to the WHERE clause.
+    """
+
     condition: str = ""
 
     if filters.get('item_group'):
@@ -34,6 +42,15 @@ def get_condition(filters: dict) -> str:
 
 
 def add_stock_qty(data: list[dict], qty_greater_than: int) -> list[dict] | list:
+    """
+    Adds stock quantity to each item if the quantity exceeds a specified threshold.
+    Args:
+        data (list[dict]): List of items to add stock quantity to.
+        qty_greater_than (int): The minimum quantity threshold.
+    Returns:
+        list[dict] | list: A list of items with quantities added if they exceed the threshold.
+    """
+
     result: list = []
     for item_code in data:
         stock_data: list[dict] = get_stock_data(item_code.get('item'))
@@ -47,6 +64,15 @@ def add_stock_qty(data: list[dict], qty_greater_than: int) -> list[dict] | list:
 
 
 def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,qty_greater_than: int) -> list[dict] | list:
+    """
+    Filters items based on warehouse  and quantity threshold.
+    Args:
+        data (list[dict]): List of items to filter.
+        warehouse (str | None): Warehouse name to filter by.
+        qty_greater_than (int):  quantity threshold for items in the specified warehouse.
+    Returns:
+        list[dict] | list: A list of items that match the warehouse and quantity criteria.
+    """
     result:list = []
     for item_code in data:
         stock_data = get_stock_data(item_code.get('item'))
@@ -66,6 +92,14 @@ def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,qty_greater_th
 
 @frappe.whitelist()
 def get_data(filters:str) -> list[dict] | None:
+    """
+    Retrieves item data based on specified filters.
+    Args:
+        filters (str): JSON string containing filter criteria for retrieving item data.
+    Returns:
+        list[dict] | None: A list of item dictionaries that match the filter criteria or None if no data.
+    """
+
     filters: dict = frappe.parse_json(filters)
     condition: str = get_condition(filters)
     where: str = "WHERE ti.disabled = 0"
