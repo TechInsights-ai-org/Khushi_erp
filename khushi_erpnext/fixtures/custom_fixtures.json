@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Stock Entry Custom Dropdown",
+    "dt": "Stock Entry",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Stock Entry', {\r\n    stock_entry_type: function(frm) {\r\n        function set_dropdown(field_name, dropdown_type, warehouse_field){\r\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\r\n                let row = locals[cdt][cdn];\r\n                var filters_value = {};\r\n                filters_value[\"company\"]=frm.doc.company;\r\n                filters_value[\"dropdown_type\"]=dropdown_type;\r\n                filters_value[\"item_code\"]=row.item_code;\r\n                filters_value[\"warehouse\"]=row[warehouse_field];\r\n                return {\r\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\r\n                    filters:filters_value\r\n                }\r\n            }\r\n        }\r\n    \r\n        if (frm.doc.stock_entry_type === \"Material Issue\") {\r\n            set_dropdown(\"s_warehouse\", \"outward\", \"\")\r\n            set_dropdown(\"rack\", \"outward\", \"s_warehouse\")\r\n        } else if (frm.doc.stock_entry_type === \"Material Transfer\" || frm.doc.stock_entry_type === \"Repack\"  || frm.doc.stock_entry_type === \"Send to Subcontractor\" || frm.doc.stock_entry_type === \"Material Consumption for Manufacture\") {\r\n            set_dropdown(\"s_warehouse\", \"outward\", \"\")\r\n            set_dropdown(\"rack\", \"outward\", \"s_warehouse\")\r\n            set_dropdown(\"t_warehouse\", \"inward\", \"\")\r\n            set_dropdown(\"to_rack\", \"inward\", \"t_warehouse\")\r\n        }else if(frm.doc.stock_entry_type === \"Material Receipt\"){\r\n            set_dropdown(\"s_warehouse\", \"inward\", \"\")\r\n            set_dropdown(\"rack\", \"inward\", \"s_warehouse\")\r\n        }\r\n    }\r\n});\r\n",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Delivery Note Custom Dropdown",
+    "dt": "Delivery Note",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Delivery Note', {\n\trefresh(frm) {\n        function set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"outward\", \"\")\n        set_dropdown(\"rack\", \"outward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Purchase Receipt Custom Dropdown",
+    "dt": "Purchase Receipt",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Purchase Receipt', {\n\trefresh(frm) {\n\t    function set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"inward\", \"\")\n        set_dropdown(\"rack\", \"inward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Subcontracting Receipt Custom Dropdown",
+    "dt": "Subcontracting Receipt",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Subcontracting Receipt', {\n\trefresh(frm) {\n\t\tfunction set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"inward\", \"\")\n        set_dropdown(\"rack\", \"inward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Sales Invoice Custom Dropdown",
+    "dt": "Sales Invoice",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\tfunction set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"outward\", \"\")\n        set_dropdown(\"rack\", \"outward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Purchase Invoice Custom Dropdown",
+    "dt": "Purchase Invoice",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Purchase Invoice', {\n\trefresh(frm) {\n\t\tfunction set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"inward\", \"\")\n        set_dropdown(\"rack\", \"inward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
+    "name": "Stock Reconciliation Custom Dropdown",
+    "dt": "Stock Reconciliation",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Stock Reconciliation', {\n\tpurpose: function(frm) {\n\t\tfunction set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        if (frm.doc.purpose === \"Opening Stock\") {\n            set_dropdown(\"warehouse\", \"inward\", \"\")\n            set_dropdown(\"rack\", \"inward\", \"warehouse\")\n        } else if(frm.doc.purpose === \"Stock Reconciliation\"){\n            set_dropdown(\"warehouse\", \"outward\", \"\")\n            set_dropdown(\"rack\", \"outward\", \"warehouse\")\n        }\n\t}\n})",
+    "doctype": "Client Script"
+  }
+]
