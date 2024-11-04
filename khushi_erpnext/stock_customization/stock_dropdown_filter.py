@@ -10,7 +10,10 @@ def get_rack_balance(filters: dict) -> tuple[list[dict], str]:
     company: str = filters.get("company", frappe.defaults.get_user_default('Company'))
     item_code: str = filters.get("item_code", "")
     warehouse: str = filters.get("warehouse", "")
-    filters = _dict({'company': company, 'from_date': '2000-01-1', 'to_date': to_date_str, 'item_code': item_code, 'warehouse': warehouse, 'valuation_field_type': 'Currency', 'rack': []})
+    filters = _dict({'company': company, 'from_date': '2000-01-1', 'to_date': to_date_str,
+                     'item_code': item_code, 'warehouse': warehouse,
+                     'valuation_field_type': 'Currency', 'rack': [],
+                     'show_dimension_wise_stock': 1})
     _, rack_balance = execute(filters)
     return rack_balance, "bal_qty"
 
