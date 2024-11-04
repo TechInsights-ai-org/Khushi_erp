@@ -15,7 +15,10 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         {fieldname: "status", label: "Status", fieldtype: "Select", options: ["","Continue", "SemiContinue", "Discontinue"]},
         {fieldname: "season", label: "Season", fieldtype: "Link", options: 'Item Segment'},
         {fieldname: "item", label: "Item", fieldtype: "Link", options: "Item"},
-        {fieldname: "qty", label: "Qty Greater than", fieldtype: "Int", defualt:0}
+        {fieldname: "comparison_type", label: "Comparison Type", fieldtype: "Link", options: "Comparison Type"},
+        {fieldname: "qty", label: "Qty", fieldtype: "Int"},
+        {fieldname: "qty_from", label: "Qty From", fieldtype: "Int"},
+        {fieldname: "qty_to", label: "Qty To", fieldtype: "Int"}
     ];
 
     // Initialize Filters
@@ -39,6 +42,36 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         marginTop: '20px',
     }).appendTo(page.body);
 
+    function toggle_display_by_filters(filters){
+        if (filters.comparison_type === 'Between') {
+            page.fields_dict.qty.$wrapper.css("display", "none");
+            page.fields_dict.qty_from.$wrapper.css("display", "block");
+            page.fields_dict.qty_to.$wrapper.css("display", "block");
+        } else if (filters.comparison_type) {
+            page.fields_dict.qty.$wrapper.css("display", "block");
+            page.fields_dict.qty_from.$wrapper.css("display", "none");
+            page.fields_dict.qty_to.$wrapper.css("display", "none");
+        } else {
+            page.fields_dict.qty.$wrapper.css("display", "none");
+            page.fields_dict.qty_from.$wrapper.css("display", "none");
+            page.fields_dict.qty_to.$wrapper.css("display", "none");
+        }
+
+    }
+
+    function get_data_and_display(filters){
+            frappe.call({
+                method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
+                args: {
+                    filters: filters,
+                },
+                callback: function (r) {
+                    grid_container.empty();
+                    display_report_data(r.message);
+                }
+            });
+    }
+
     function update_dashboard() {
         let filters = {
             warehouse: page.fields_dict.warehouse.get_value(),
@@ -49,19 +82,28 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             status: page.fields_dict.status.get_value(),
             season: page.fields_dict.season.get_value(),
             item: page.fields_dict.item.get_value(),
-            qty: page.fields_dict.qty.get_value()
+            comparison_type: page.fields_dict.comparison_type.get_value(),
+            qty: page.fields_dict.qty.get_value(),
+            qty_from: page.fields_dict.qty_from ? page.fields_dict.qty_from.get_value() : null,
+            qty_to: page.fields_dict.qty_to ? page.fields_dict.qty_to.get_value() : null,
         };
-        frappe.call({
-            method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
-            args: {
-                filters: filters,
-            },
-            callback: function (r) {
-                grid_container.empty();
-                display_report_data(r.message);
+        toggle_display_by_filters(filters)
 
+        // TODO to clear the qty once the comparsion field changes
+        if (filters.comparison_type) {
+            if(filters.qty || (filters.qty_from && filters.qty_to)){
+                console.log("geting info from server . .  .")
+                get_data_and_display(filters)
             }
-        });
+            else{
+                console.log("Condition Not statifised")
+            }
+
+        }
+        else {
+            console.log("geting info from server . .  .")
+            get_data_and_display(filters)
+        }
     }
 
     function reset_filters() {

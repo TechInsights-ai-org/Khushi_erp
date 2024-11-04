@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Between",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:05:22.819612",
+    "modified": "2024-11-04 23:05:22.819612",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Between",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:47:47.487Z"
+  },
+  {
+    "name": "Less than or Equal to",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:04:33.512201",
+    "modified": "2024-11-04 23:04:33.512201",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Less than or Equal to",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:47:58.106Z"
+  },
+  {
+    "name": "Less than",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:04:20.170909",
+    "modified": "2024-11-04 23:04:20.170909",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Less than",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:48:10.128Z"
+  },
+  {
+    "name": "Greater than or Equal to",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:04:05.459339",
+    "modified": "2024-11-04 23:04:05.459339",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Greater than or Equal to",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:48:19.284Z"
+  },
+  {
+    "name": "Greater than",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:03:54.736768",
+    "modified": "2024-11-04 23:03:54.736768",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Greater than",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:48:41.333Z"
+  },
+  {
+    "name": "Not Equals",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:03:44.198675",
+    "modified": "2024-11-04 23:03:44.198675",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Not Equals",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:48:51.672Z"
+  },
+  {
+    "name": "Equals",
+    "owner": "Administrator",
+    "creation": "2024-11-04 23:03:33.914020",
+    "modified": "2024-11-04 23:03:33.914020",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "comparison_type": "Equals",
+    "doctype": "Comparison Type",
+    "__last_sync_on": "2024-11-04T17:49:04.153Z"
+  }
+]
