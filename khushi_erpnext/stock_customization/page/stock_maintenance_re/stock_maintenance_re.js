@@ -1,3 +1,5 @@
+let previous_comparison_type = null;
+
 frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
@@ -42,6 +44,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         marginTop: '20px',
     }).appendTo(page.body);
 
+    //  Based the filter hide or display's the page fields
     function toggle_display_by_filters(filters){
         if (filters.comparison_type === 'Between') {
             page.fields_dict.qty.$wrapper.css("display", "none");
@@ -59,6 +62,23 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
 
     }
 
+    //  Reset the quantity fields based on the comparison_type
+    function reset_quantity_fields_and_return_updated_filters(){
+        let filters = get_filters_value()
+        const current_comparison_type = page.fields_dict.comparison_type.get_value()
+        if ( current_comparison_type != previous_comparison_type ){
+            page.fields_dict.qty.set_value(null);
+            page.fields_dict.qty_from.set_value(null);
+            page.fields_dict.qty_to.set_value(null);
+            filters.qty =  null
+            filters.qty_from =  null
+            filters.qty_to = null
+            previous_comparison_type = filters.comparison_type;
+        }
+        return filters
+    }
+
+    //  Retrieve data from the backend and process it for display
     function get_data_and_display(filters){
             frappe.call({
                 method: "khushi_erpnext.stock_customization.page.stock_maintenance_re.stock_maintenance_re.get_data",
@@ -72,7 +92,8 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             });
     }
 
-    function update_dashboard() {
+    //  Retrieves the Filter Value
+    function get_filters_value(){
         let filters = {
             warehouse: page.fields_dict.warehouse.get_value(),
             item_group: page.fields_dict.item_group.get_value(),
@@ -83,38 +104,39 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             season: page.fields_dict.season.get_value(),
             item: page.fields_dict.item.get_value(),
             comparison_type: page.fields_dict.comparison_type.get_value(),
-            qty: page.fields_dict.qty.get_value(),
+            qty: page.fields_dict.qty ? page.fields_dict.qty.get_value() : null,
             qty_from: page.fields_dict.qty_from ? page.fields_dict.qty_from.get_value() : null,
-            qty_to: page.fields_dict.qty_to ? page.fields_dict.qty_to.get_value() : null,
+            qty_to: page.fields_dict.qty_to ? page.fields_dict.qty_to.get_value() : null
         };
-        toggle_display_by_filters(filters)
+        return filters
 
-        // TODO to clear the qty once the comparsion field changes
+    }
+
+    //  To Update Dashboard
+    function update_dashboard() {
+        let filters = reset_quantity_fields_and_return_updated_filters()
+        toggle_display_by_filters(filters)
         if (filters.comparison_type) {
-            if(filters.qty || (filters.qty_from && filters.qty_to)){
-                console.log("geting info from server . .  .")
+            if(filters.qty || filters.qty === 0 ||  ((filters.qty_from || filters.qty_from === 0 && filters.qty_to))){
                 get_data_and_display(filters)
             }
-            else{
-                console.log("Condition Not statifised")
-            }
-
         }
         else {
-            console.log("geting info from server . .  .")
             get_data_and_display(filters)
         }
     }
 
+
+    // To rest the filters
     function reset_filters() {
         filter_fields.forEach(function (field) {
             page.fields_dict[field.fieldname].set_value('');
         });
         update_dashboard();
     }
-
     page.add_button('Reset Filters', reset_filters);
 
+    //  To display report
     function display_report_data(items) {
         if (!items || items.length === 0) {
         $('<div>No data found</div>')
@@ -169,6 +191,11 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                     borderRadius: '8px',
                     marginBottom: '10px'
                 }).appendTo(item_div);
+            $('<a>')
+                .attr('href', item.image || 'placeholder-image-url.png')
+                .attr('target', '_blank') // Opens in a new tab
+                .append(img) // Append the image inside the link
+                .appendTo(item_div);
 
             // Item Code / Name
             $('<div></div>').text(`Item: ${item.item || 'No Item Code'}`)
@@ -177,6 +204,9 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                     fontSize: '14px',
                     marginBottom: '8px',
                     color: '#333' // Darker text for contrast
+                })
+                .on('click', function() {
+                window.location.href = (`${window.location.href.split("/app/")[0]}/app/item/${item.item}`)
                 }).appendTo(item_div);
 
             // Item description
@@ -193,8 +223,9 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                     fontSize: '12px',
                     color: '#333'
                 }).appendTo(item_div);
+
         });
+
     }
      update_dashboard();
 }
-
