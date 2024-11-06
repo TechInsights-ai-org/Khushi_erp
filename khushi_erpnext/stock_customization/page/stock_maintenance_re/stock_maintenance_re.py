@@ -1,7 +1,7 @@
 
 import frappe
 from erpnext.stock.dashboard.item_dashboard import get_data as get_stock_data
-from erpnext.stock.doctype.warehouse.test_warehouse import get_warehouse
+from khushi_erpnext.core_customization.doctype.comparison_type import compare_qty
 
 
 
@@ -41,7 +41,7 @@ def get_condition(filters: dict) -> str:
 
 
 
-def add_stock_qty(data: list[dict], qty_greater_than: int) -> list[dict] | list:
+def add_stock_qty(data: list[dict], comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
     """
     Adds stock quantity to each item if the quantity exceeds a specified threshold.
     Args:
@@ -57,21 +57,24 @@ def add_stock_qty(data: list[dict], qty_greater_than: int) -> list[dict] | list:
         qty: int = 0
         for stock in stock_data:
             qty += stock.get('actual_qty')
-        if qty > qty_greater_than:
-            item_code['qty'] = qty
+        item_code['qty'] = qty
+        if comparison_type:
+            if compare_qty(actual_qty=qty,comparison_type=comparison_type,filter_constraint_values=comparison_filter_values):
+                result.append(item_code)
+        else:
             result.append(item_code)
     return result
 
 
-def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,qty_greater_than: int) -> list[dict] | list:
+def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
     """
-    Filters items based on warehouse  and quantity threshold.
-    Args:
-        data (list[dict]): List of items to filter.
-        warehouse (str | None): Warehouse name to filter by.
-        qty_greater_than (int):  quantity threshold for items in the specified warehouse.
-    Returns:
-        list[dict] | list: A list of items that match the warehouse and quantity criteria.
+        Filters items based on warehouse  and quantity threshold.
+        Args:
+            data (list[dict]): List of items to filter.
+            warehouse (str | None): Warehouse name to filter by.
+            qty_greater_than (int):  quantity threshold for items in the specified warehouse.
+        Returns:
+            list[dict] | list: A list of items that match the warehouse and quantity criteria.
     """
     result:list = []
     for item_code in data:
@@ -82,11 +85,17 @@ def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,qty_greater_th
             stock_dict['warehouse'] = stock.get('warehouse')
             stock_dict['item'] = item_code.get('item')
             stock_dict['image'] = item_code.get('image')
+            stock_dict['item_group'] = item_code.get('item_group')
             result.append(stock_dict)
+
     warehouse_data: list = []
     for data in result:
-        if data.get('warehouse') == warehouse and data.get('qty',0) > qty_greater_than:
-            warehouse_data.append(data)
+        if data.get('warehouse') == warehouse:
+            if comparison_type:
+                if compare_qty(actual_qty=data.get('qty'),comparison_type=comparison_type,filter_constraint_values=comparison_filter_values):
+                    warehouse_data.append(data)
+            else:
+                warehouse_data.append(data)
     return warehouse_data
 
 
@@ -99,16 +108,13 @@ def get_data(filters:str) -> list[dict] | None:
     Returns:
         list[dict] | None: A list of item dictionaries that match the filter criteria or None if no data.
     """
-
     filters: dict = frappe.parse_json(filters)
     condition: str = get_condition(filters)
     where: str = "WHERE ti.disabled = 0 AND ti.is_stock_item = 1"
-    qty_filter: int = filters.get('qty')
-    if qty_filter is None:
-        qty_filter = -1
-    if condition:
-        where = f" WHERE ti.disabled = 0 {condition} "
-
+    where += f" {condition}"
+    comparison_type: str = filters.get('comparison_type',"") or ""
+    comparison_filter_values:dict = {"value":filters.get("qty"),"value_from":filters.get("qty_from"),"value_to":filters.get("qty_to")}
+    
     query: str = f"""
             SELECT 
                 ti.name as item,
@@ -122,7 +128,8 @@ def get_data(filters:str) -> list[dict] | None:
 
     data = frappe.db.sql(query, as_dict=True)
     if data and not filters.get('warehouse'):
-        data = add_stock_qty(data,qty_filter)
+        data = add_stock_qty(data,comparison_type,comparison_filter_values)
     if data and filters.get('warehouse'):
-        data = get_warehouse_based_qty(data,filters.get('warehouse'),qty_filter)
+        data = get_warehouse_based_qty(data,filters.get('warehouse'),comparison_type,comparison_filter_values)
     return data
+
