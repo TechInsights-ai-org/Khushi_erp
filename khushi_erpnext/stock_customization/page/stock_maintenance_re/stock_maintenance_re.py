@@ -114,7 +114,7 @@ def get_data(filters:str) -> list[dict] | None:
     comparison_type: str = filters.get('comparison_type',"") or ""
     comparison_filter_values:dict = {"value":filters.get("qty"),"value_from":filters.get("qty_from"),"value_to":filters.get("qty_to")}
     if condition:
-        where = f" WHERE ti.disabled = 0 {condition} "
+        where += f" {condition}"
 
     query: str = f"""
             SELECT 
