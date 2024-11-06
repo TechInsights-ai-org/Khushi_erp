@@ -111,11 +111,10 @@ def get_data(filters:str) -> list[dict] | None:
     filters: dict = frappe.parse_json(filters)
     condition: str = get_condition(filters)
     where: str = "WHERE ti.disabled = 0 AND ti.is_stock_item = 1"
+    where += f" {condition}"
     comparison_type: str = filters.get('comparison_type',"") or ""
     comparison_filter_values:dict = {"value":filters.get("qty"),"value_from":filters.get("qty_from"),"value_to":filters.get("qty_to")}
-    if condition:
-        where += f" {condition}"
-
+    
     query: str = f"""
             SELECT 
                 ti.name as item,
