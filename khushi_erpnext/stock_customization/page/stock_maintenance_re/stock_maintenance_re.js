@@ -206,7 +206,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                     color: '#333' // Darker text for contrast
                 })
                 .on('click', function() {
-                window.location.href = (`${window.location.href.split("/app/")[0]}/app/item/${item.item}`)
+                    window.open(`${window.location.href.split("/app/")[0]}/app/item/${item.item}`,'_blank')
                 }).appendTo(item_div);
 
             // Item description
