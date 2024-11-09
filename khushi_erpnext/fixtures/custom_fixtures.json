@@ -61,5 +61,35 @@
     "enabled": 1,
     "script": "frappe.ui.form.on('Stock Reconciliation', {\n\tpurpose: function(frm) {\n\t\tfunction set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"items\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        if (frm.doc.purpose === \"Opening Stock\") {\n            set_dropdown(\"warehouse\", \"inward\", \"\")\n            set_dropdown(\"rack\", \"inward\", \"warehouse\")\n        } else if(frm.doc.purpose === \"Stock Reconciliation\"){\n            set_dropdown(\"warehouse\", \"outward\", \"\")\n            set_dropdown(\"rack\", \"outward\", \"warehouse\")\n        }\n\t}\n})",
     "doctype": "Client Script"
+  },
+  {
+    "name": "Create Default rack",
+    "script_type": "DocType Event",
+    "reference_doctype": "Warehouse",
+    "event_frequency": "All",
+    "doctype_event": "After Insert",
+    "allow_guest": 0,
+    "module": "Stock customization",
+    "disabled": 0,
+    "script": "frappe.get_doc({\"doctype\":\"Rack\", \"rack\":doc.warehouse_name, \"warehouse\":doc.warehouse_name}).insert()",
+    "enable_rate_limit": 0,
+    "rate_limit_count": 5,
+    "rate_limit_seconds": 86400,
+    "doctype": "Server Script"
+  },
+  {
+    "name": "Delete Default rack",
+    "script_type": "DocType Event",
+    "reference_doctype": "Warehouse",
+    "event_frequency": "All",
+    "doctype_event": "Before Delete",
+    "allow_guest": 0,
+    "module": "Stock customization",
+    "disabled": 0,
+    "script": "frappe.delete_doc(\"Rack\", doc.warehouse_name)",
+    "enable_rate_limit": 0,
+    "rate_limit_count": 5,
+    "rate_limit_seconds": 86400,
+    "doctype": "Server Script"
   }
 ]
