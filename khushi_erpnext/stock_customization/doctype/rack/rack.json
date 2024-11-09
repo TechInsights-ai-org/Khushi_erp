@@ -1,11 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:rack",
  "creation": "2024-11-01 20:31:56.644060",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "section_break_8eti",
+  "disabled",
   "rack",
   "warehouse"
  ],
@@ -17,21 +19,30 @@
   {
    "fieldname": "rack",
    "fieldtype": "Data",
-   "label": "Rack"
+   "label": "Rack",
+   "unique": 1
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "label": "Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Disabled"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-01 20:32:39.320195",
+ "modified": "2024-11-09 16:07:23.603382",
  "modified_by": "Administrator",
  "module": "Stock customization",
  "name": "Rack",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

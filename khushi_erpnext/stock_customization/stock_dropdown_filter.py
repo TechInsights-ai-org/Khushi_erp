@@ -39,9 +39,24 @@ def get_outward_dropdown_list(doctype: str, txt: str, filters: dict) -> list[lis
         doc_record: str | None = value.get(doc_key, "")
         if not doc_record:
             continue
+        doc: "Document" = frappe.get_doc(doctype, doc_record)
+        if doc.disabled:
+            continue
+        actual_balance = value.get(balance_key)
+        if not actual_balance:
+            continue
         if lower_search_txt in doc_record.lower() or not lower_search_txt:
-            dropdown_list.append([doc_record, f"Actual balance: {value.get(balance_key)}"])
+            dropdown_list.append([doc_record, f"Actual balance: {actual_balance}"])
     return dropdown_list
+
+
+def get_condition(txt: str, searchfield: str, cond_list: None | list = None) -> str:
+    if not cond_list:
+        cond_list: list = []
+    if txt:
+        cond_list.append(f"{searchfield} LIKE \"%{txt}%\"")
+    cond: str = "WHERE disabled = 0 AND " + " AND ".join(cond_list) if cond_list else "WHERE disabled = 0"
+    return cond
 
 
 def get_inward_dropdown_list(doctype: str, txt: str, searchfield: str, filters: dict) -> list[list[str]]:
@@ -49,9 +64,7 @@ def get_inward_dropdown_list(doctype: str, txt: str, searchfield: str, filters: 
     warehouse: str = filters.get("warehouse", "")
     if doctype == "Rack" and warehouse:
         cond_list.append(f" warehouse='{warehouse}' ")
-    if txt:
-        cond_list.append(f" {searchfield} LIKE \"%{txt}%\" ")
-    cond: str = "WHERE" + "AND".join(cond_list) if cond_list else ""
+    cond: str = get_condition(txt, searchfield, cond_list)
     return frappe.db.sql(f"""SELECT name From `tab{doctype}` {cond}""")
 
 
@@ -59,10 +72,7 @@ def get_inward_dropdown_list(doctype: str, txt: str, searchfield: str, filters: 
 def stock_dropdown_filter(doctype: str, txt: str, searchfield: str, start: int, page_len: int, filters: dict)-> list[list[str]]:
     dropdown_type: str = filters.get("dropdown_type", "")
     item_code: str = filters.get("item_code", "")
-    cond_list: list = []
-    if txt:
-        cond_list.append(f"{searchfield} LIKE \"%{txt}%\"")
-    cond: str = "WHERE" + " AND ".join(cond_list) if cond_list else ""
+    cond: str = get_condition(txt, searchfield)
     if not dropdown_type:
         return frappe.db.sql(f"""SELECT name From `tab{doctype}` {cond}""")
     if not item_code and dropdown_type == "outward":
