@@ -63,6 +63,15 @@
     "doctype": "Client Script"
   },
   {
+    "name": "Pick List Custom Dropdown",
+    "dt": "Pick List",
+    "view": "Form",
+    "module": "Stock customization",
+    "enabled": 1,
+    "script": "frappe.ui.form.on('Pick List', {\n\trefresh(frm) {\n\t    function set_dropdown(field_name, dropdown_type, warehouse_field){\n            frm.fields_dict[\"locations\"].grid.get_field(field_name).get_query = function(doc, cdt, cdn) {\n                let row = locals[cdt][cdn];\n                var filters_value = {};\n                filters_value[\"company\"]=frm.doc.company;\n                filters_value[\"dropdown_type\"]=dropdown_type;\n                filters_value[\"item_code\"]=row.item_code;\n                filters_value[\"warehouse\"]=row[warehouse_field];\n                return {\n                    query: 'khushi_erpnext.stock_customization.stock_dropdown_filter.stock_dropdown_filter',\n                    filters:filters_value\n                }\n            }\n        }\n        set_dropdown(\"warehouse\", \"outward\", \"\")\n        set_dropdown(\"rack\", \"outward\", \"warehouse\")\n\t}\n})",
+    "doctype": "Client Script"
+  },
+  {
     "name": "Create Default rack",
     "script_type": "DocType Event",
     "reference_doctype": "Warehouse",
