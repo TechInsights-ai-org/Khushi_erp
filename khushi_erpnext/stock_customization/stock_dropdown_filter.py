@@ -10,9 +10,10 @@ def get_rack_balance(filters: dict) -> tuple[list[dict], str]:
     company: str = filters.get("company", frappe.defaults.get_user_default('Company'))
     item_code: str = filters.get("item_code", "")
     warehouse: str = filters.get("warehouse", "")
+    rack_list: list =[filters.get("rack", "")] if filters.get("rack", "") else []
     filters = _dict({'company': company, 'from_date': '2000-01-1', 'to_date': to_date_str,
                      'item_code': item_code, 'warehouse': warehouse,
-                     'valuation_field_type': 'Currency', 'rack': [],
+                     'valuation_field_type': 'Currency', 'rack': rack_list,
                      'show_dimension_wise_stock': 1})
     _, rack_balance = execute(filters)
     return rack_balance, "bal_qty"
@@ -23,17 +24,9 @@ def get_warehouse_balance(filters: dict) -> tuple[list[dict], str]:
     return warehouse_balance, "actual_qty"
 
 
-def get_outward_dropdown_list(doctype: str, txt: str, filters: dict) -> list[list[str]]:
-    dropdown_list: list[list[str]] = []
-    balance_dict: list[dict] = []
+def form_balance_list(doctype: str, txt: str, balance_dict: list[dict], balance_key: str, balance_formatting_str: str) -> list[list[str]]:
+    balance_list: list[list[str]] = []
     doc_key: str = doctype.lower()
-    balance_key: str = ""
-    if doctype == "Warehouse":
-        balance_dict, balance_key = get_warehouse_balance(filters)
-    elif doctype == "Rack":
-        balance_dict, balance_key = get_rack_balance(filters)
-    if not balance_dict:
-        return []
     lower_search_txt: str = txt.lower()
     for value in balance_dict:
         doc_record: str | None = value.get(doc_key, "")
@@ -46,7 +39,29 @@ def get_outward_dropdown_list(doctype: str, txt: str, filters: dict) -> list[lis
         if not actual_balance:
             continue
         if lower_search_txt in doc_record.lower() or not lower_search_txt:
-            dropdown_list.append([doc_record, f"Actual balance: {actual_balance}"])
+            balance: str = f"{balance_formatting_str} {actual_balance}" if balance_formatting_str else str(
+                actual_balance)
+            balance_list.append([doc_record, balance])
+    return balance_list
+
+
+@frappe.whitelist()
+def get_balance(doctype: str, txt: str, filters: dict | str, balance_formatting_str: str = "") -> list[list[str]]:
+    filters = frappe.parse_json(filters)
+    balance_dict: list[dict] = []
+    balance_key: str = ""
+    if doctype == "Warehouse":
+        balance_dict, balance_key = get_warehouse_balance(filters)
+    elif doctype == "Rack":
+        balance_dict, balance_key = get_rack_balance(filters)
+    if not balance_dict:
+        return []
+    balance_list = form_balance_list(doctype, txt, balance_dict, balance_key, balance_formatting_str)
+    return balance_list
+
+
+def get_outward_dropdown_list(doctype: str, txt: str, filters: dict) -> list[list[str]]:
+    dropdown_list = get_balance(doctype, txt, filters, "Actual balance:")
     return dropdown_list
 
 
