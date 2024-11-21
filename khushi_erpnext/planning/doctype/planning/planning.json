@@ -1,0 +1,389 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-11-08 06:28:13.600182",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_detaila_section",
+  "naming_series",
+  "title",
+  "detail",
+  "column_break_pedg",
+  "segment",
+  "ref_image",
+  "selling_rate",
+  "buying_rate",
+  "process_tab",
+  "process_detail",
+  "paper_board",
+  "pb",
+  "setting_files_tab",
+  "layout",
+  "cost_tab",
+  "item_group",
+  "item",
+  "remark",
+  "column_break_snqh",
+  "total_sheets",
+  "ups",
+  "packing",
+  "wastage",
+  "total_qnty",
+  "column_break_gyzk",
+  "net_sales_rate_with_tax",
+  "net_sales_rate_without_tax",
+  "roi_details_section",
+  "roi_without_tax",
+  "ros_with_tax",
+  "column_break_wtkn",
+  "roi_with_tax",
+  "ros_without_tax",
+  "section_break_juwk",
+  "total_investment_bef_gst",
+  "total_investment_with_gst",
+  "input_gst",
+  "column_break_dvww",
+  "fix_cost_bef_tax",
+  "fix_cost_with_tax",
+  "column_break_jjsc",
+  "variable_cost_bef_tax",
+  "variable_cost_with_tax",
+  "section_break_gjnn",
+  "cost_with_gst",
+  "cost_without_gst",
+  "column_break_oznu",
+  "fix_cost_with_gst",
+  "fix_cost_without_gst",
+  "section_break_plef",
+  "costing_sub_detail"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_detaila_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Detaila"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "naming_series",
+   "options": "P.YY.-.####."
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "detail",
+   "fieldtype": "Small Text",
+   "label": "Details"
+  },
+  {
+   "fieldname": "column_break_pedg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "segment",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Segment",
+   "options": "Item Segment"
+  },
+  {
+   "fieldname": "ref_image",
+   "fieldtype": "Attach Image",
+   "label": "Ref Image"
+  },
+  {
+   "description": "With Tax",
+   "fieldname": "selling_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Selling Rate"
+  },
+  {
+   "description": "Without Tax from Delhi",
+   "fieldname": "buying_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Buying Rate "
+  },
+  {
+   "fieldname": "process_tab",
+   "fieldtype": "Tab Break",
+   "label": "Process"
+  },
+  {
+   "fieldname": "process_detail",
+   "fieldtype": "Table",
+   "label": "Process Detail",
+   "options": "Planning_process_child"
+  },
+  {
+   "fieldname": "paper_board",
+   "fieldtype": "Tab Break",
+   "label": "Paper & Board"
+  },
+  {
+   "fieldname": "pb",
+   "fieldtype": "Table",
+   "label": "Paper & Board",
+   "options": "Planning Paper And Board"
+  },
+  {
+   "fieldname": "setting_files_tab",
+   "fieldtype": "Tab Break",
+   "label": "Layout"
+  },
+  {
+   "fieldname": "layout",
+   "fieldtype": "Table",
+   "label": "Layout",
+   "options": "Layout"
+  },
+  {
+   "fieldname": "cost_tab",
+   "fieldtype": "Tab Break",
+   "label": "Cost"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "column_break_snqh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_sheets",
+   "fieldtype": "Float",
+   "label": "Total Sheets",
+   "precision": "0"
+  },
+  {
+   "default": "0",
+   "fieldname": "ups",
+   "fieldtype": "Float",
+   "label": "Ups",
+   "precision": "1"
+  },
+  {
+   "default": "0",
+   "fieldname": "packing",
+   "fieldtype": "Float",
+   "label": "Packing",
+   "precision": "0"
+  },
+  {
+   "default": "0",
+   "fieldname": "wastage",
+   "fieldtype": "Percent",
+   "label": "Wastage Percent",
+   "precision": "0"
+  },
+  {
+   "fieldname": "total_qnty",
+   "fieldtype": "Data",
+   "label": "Total Output"
+  },
+  {
+   "fieldname": "column_break_gyzk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "net_sales_rate_with_tax",
+   "fieldtype": "Float",
+   "label": "Net Sales Rate With Tax",
+   "precision": "2"
+  },
+  {
+   "fieldname": "net_sales_rate_without_tax",
+   "fieldtype": "Float",
+   "label": "Net Sales Rate Without Tax",
+   "precision": "2"
+  },
+  {
+   "fieldname": "roi_details_section",
+   "fieldtype": "Section Break",
+   "label": "ROI Details"
+  },
+  {
+   "fieldname": "roi_without_tax",
+   "fieldtype": "Percent",
+   "label": "ROI (Without Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "ros_with_tax",
+   "fieldtype": "Percent",
+   "label": "Return on Sales (With Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_wtkn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "roi_with_tax",
+   "fieldtype": "Percent",
+   "label": "ROI (With Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "ros_without_tax",
+   "fieldtype": "Percent",
+   "label": "Return on Sales (Without Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_juwk",
+   "fieldtype": "Section Break",
+   "label": "Investment Details"
+  },
+  {
+   "fieldname": "total_investment_bef_gst",
+   "fieldtype": "Float",
+   "label": "Total Investment (Bef. GST)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_investment_with_gst",
+   "fieldtype": "Float",
+   "label": "Total Investment With GST",
+   "precision": "2"
+  },
+  {
+   "fieldname": "input_gst",
+   "fieldtype": "Float",
+   "label": "Input GST",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_dvww",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fix_cost_bef_tax",
+   "fieldtype": "Float",
+   "label": "Fix Cost (Bef Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "fix_cost_with_tax",
+   "fieldtype": "Float",
+   "label": "Fix Cost (With Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_jjsc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variable_cost_bef_tax",
+   "fieldtype": "Float",
+   "label": "Variable Cost (Bef Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "variable_cost_with_tax",
+   "fieldtype": "Float",
+   "label": "Variable Cost (With Tax)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_gjnn",
+   "fieldtype": "Section Break",
+   "label": "Cost Detail"
+  },
+  {
+   "fieldname": "cost_with_gst",
+   "fieldtype": "Float",
+   "label": "Cost With GST",
+   "precision": "2"
+  },
+  {
+   "fieldname": "cost_without_gst",
+   "fieldtype": "Float",
+   "label": "Cost Without GST",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_oznu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fix_cost_with_gst",
+   "fieldtype": "Float",
+   "label": "Fix Cost With GST"
+  },
+  {
+   "fieldname": "fix_cost_without_gst",
+   "fieldtype": "Float",
+   "label": "Fix Cost Without GST",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_plef",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "costing_sub_detail",
+   "fieldtype": "Table",
+   "label": "Costing Sub Detail",
+   "options": "Costing Child"
+  }
+ ],
+ "image_field": "ref_image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2024-11-21 23:52:44.806598",
+ "modified_by": "Administrator",
+ "module": "Planning",
+ "name": "Planning",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_name_in_global_search": 1,
+ "show_preview_popup": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
