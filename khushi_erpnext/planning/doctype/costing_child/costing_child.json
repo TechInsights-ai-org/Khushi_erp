@@ -120,18 +120,19 @@
   {
    "fieldname": "gst_amount",
    "fieldtype": "Float",
-   "label": "Gst_Amount"
+   "label": "GST Amount"
   },
   {
    "fieldname": "total_amt",
    "fieldtype": "Float",
-   "label": "Total Amount"
+   "label": "Total Amount",
+   "precision": "2"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-21 23:13:48.246399",
+ "modified": "2024-11-23 09:40:51.197553",
  "modified_by": "Administrator",
  "module": "Planning",
  "name": "Costing Child",
