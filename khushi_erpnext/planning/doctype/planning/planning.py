@@ -6,34 +6,78 @@ from frappe.model.document import Document
 
 
 class Planning(Document):
+
 	def update_total_output(self) -> None:
 		if float(self.packing) == 0:
 			frappe.msgprint("Packing value cannot be zero.")
 			return
-		_output: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
-		self.total_qnty = _output
+		self.total_qnty: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
 
-	def get_sum(self, table: list, field: str) -> float | int:
-		return sum([getattr(table_row, field) if getattr(table_row, field) else 0 for table_row in table])
 
-	def update_investment_details(self):
+	def get_costing_value(self,field: str, fc:bool = False , vc:bool = False) -> float | int:
+		fc_total, vc_total, total = 0, 0, 0
 		costing_details : list = self.costing_sub_detail
-		fix_cost_bef_tax: float = self.fix_cost_bef_tax or 0
-		fix_cost_with_gst: float = self.fix_cost_with_tax or 0
-		if costing_details:
-			self.total_investment_bef_gst: float | int = self.get_sum(costing_details,"amt_bef_tax")
-			self.total_investment_with_gst: float | int = self.get_sum(costing_details,"total_amt")
-			self.input_gst: float | int = self.get_sum(costing_details,"gst_amount")
-			self.fix_cost_bef_tax: float | int = self.total_investment_bef_gst - (fix_cost_with_gst + fix_cost_bef_tax)
+		for costing_detail in costing_details:
+			if hasattr(costing_detail, field) and costing_detail.count == 1:
+				value = getattr(costing_detail, field) or 0
+				if costing_detail.cost_type == "FC":
+					fc_total += value
+				elif costing_detail.cost_type == "VC":
+					vc_total += value
+				total += value
+		if fc:
+			return fc_total
+		elif vc:
+			return vc_total
+		return total
+
+	def update_investment(self):
+		self.total_investment_bef_gst: float  = self.get_costing_value("amt_bef_tax")
+		self.total_investment_with_gst: float  = self.get_costing_value("total_amt")
+		self.fix_cost_bef_tax: float  = self.total_investment_bef_gst - self.get_costing_value("amt_bef_tax",fc=True,vc = False)
+		self.fix_cost_with_tax: float  = self.total_investment_with_gst - self.get_costing_value("total_amt",fc=True , vc = False)
+		self.variable_cost_bef_tax: float  = self.total_investment_bef_gst -  self.get_costing_value("amt_bef_tax",vc=True ,fc=False)
+		self.variable_cost_with_tax: float  = self.total_investment_with_gst - self.get_costing_value("total_amt",vc=True, fc=False)
+		self.input_gst: float = self.get_costing_value("gst_amount")
 
 	def update_cost_details(self):
-		self.total_investment_with_gst = 0
-		# TODO
+		if self.total_qnty == 0:
+			return
+		self.cost_with_gst: float = self.total_investment_with_gst / self.total_qnty
+		self.cost_without_gst: float = self.total_investment_bef_gst / self.total_qnty
+		self.fix_cost_with_gst: float = self.fix_cost_with_tax / self.total_qnty
+		self.fix_cost_without_gst:  float = self.fix_cost_bef_tax / self.total_qnty
+
+	def update_cost_table(self):
+		cost_table : list = self.costing_sub_detail
+		if cost_table:
+			for cost_data in cost_table:
+				qnty = cost_data.qnty or 0
+				s1 = cost_data.s1 or 0
+				s2 = cost_data.s2 or 0
+				weight = cost_data.weight or 0
+				rate = cost_data.rate or 0
+				rate_unit = cost_data.rate_unit or 0
+				cost_data.amt_bef_tax: float = 0.00
+				if cost_data.rate_unit and cost_data.rate_unit !=0 :
+					cost_data.amt_bef_tax = (qnty * s1 * s2 * weight * rate) / rate_unit
+				if cost_data.gst:
+					gst_percentage = eval(cost_data.gst.replace("%",""))
+					if gst_percentage <= 9:
+						gst_percentage = gst_percentage/10
+					else:
+						gst_percentage = gst_percentage /100
+
+					cost_data.gst_amount: float = cost_data.amt_bef_tax * gst_percentage
+				cost_data.total_amt: float = cost_data.amt_bef_tax + cost_data.gst_amount
 
 
 	def before_save(self):
+		self.update_cost_table()
 		self.update_total_output()
-		self.update_investment_details()
+		self.update_investment()
 		self.update_cost_details()
+
+
 
 
