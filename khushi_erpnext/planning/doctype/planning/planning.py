@@ -11,6 +11,9 @@ class Planning(Document):
 		if float(self.packing) == 0:
 			return
 		self.total_qnty: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
+		if self.total_qnty is None or not self.total_qnty:
+			self.total_qnty = 0
+
 
 
 	def get_costing_value(self,field: str, fc:bool = False , vc:bool = False) -> float | int:
