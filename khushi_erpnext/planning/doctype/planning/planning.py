@@ -11,8 +11,6 @@ class Planning(Document):
 		if float(self.packing) == 0:
 			return
 		self.total_qnty: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
-		if self.total_qnty is None or not self.total_qnty:
-			self.total_qnty = 0
 
 
 
@@ -55,7 +53,7 @@ class Planning(Document):
 
 	def update_cost_details(self):
 		""" Updates the value for the fields that are in cost details Tab """
-		if self.total_qnty == 0:
+		if self.total_qnty == 0 or self.total_qnty is None:
 			return
 		self.cost_with_gst: float = self.total_investment_with_gst / self.total_qnty
 		self.cost_without_gst: float = self.total_investment_bef_gst / self.total_qnty
