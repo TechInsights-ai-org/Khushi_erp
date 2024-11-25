@@ -9,7 +9,6 @@ class Planning(Document):
 	def update_total_output(self) -> None:
 		""" Calculates the total quantity (output) """
 		if float(self.packing) == 0:
-			frappe.msgprint("Packing value cannot be zero.")
 			return
 		self.total_qnty: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
 
@@ -76,10 +75,7 @@ class Planning(Document):
 					cost_data.amt_bef_tax: float = (qnty * s1 * s2 * weight * rate) / rate_unit
 				if cost_data.gst:
 					gst_percentage: int | float = eval(cost_data.gst.replace("%",""))
-					if gst_percentage <= 9:
-						gst_percentage = gst_percentage/10
-					else:
-						gst_percentage = gst_percentage /100
+					gst_percentage = gst_percentage /100
 					cost_data.gst_amount: float = cost_data.amt_bef_tax * gst_percentage
 				cost_data.total_amt: float = cost_data.amt_bef_tax + cost_data.gst_amount
 
