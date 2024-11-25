@@ -9,7 +9,6 @@ class Planning(Document):
 	def update_total_output(self) -> None:
 		""" Calculates the total quantity (output) """
 		if float(self.packing) == 0:
-			frappe.msgprint("Packing value cannot be zero.")
 			return
 		self.total_qnty: float = ((float(self.total_sheets) * float(self.ups)) - (float(self.total_sheets) * float(self.ups) * float(self.wastage))) / float(self.packing)
 
