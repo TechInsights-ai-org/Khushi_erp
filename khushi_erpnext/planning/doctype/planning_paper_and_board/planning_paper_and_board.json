@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-09 09:23:44.444592",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "component",
+  "pb",
+  "ups",
+  "total_sheet",
+  "total_output",
+  "remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "component",
+   "fieldtype": "Link",
+   "label": "Component",
+   "options": "Costing Component"
+  },
+  {
+   "fieldname": "pb",
+   "fieldtype": "Link",
+   "label": "Paper & Board",
+   "options": "Item"
+  },
+  {
+   "fieldname": "ups",
+   "fieldtype": "Float",
+   "label": "Ups",
+   "precision": "1"
+  },
+  {
+   "fieldname": "total_sheet",
+   "fieldtype": "Float",
+   "label": "Total Sheets",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_output",
+   "fieldtype": "Float",
+   "label": "Total Output",
+   "precision": "2"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "label": "Remark"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-11-21 23:33:21.225642",
+ "modified_by": "Administrator",
+ "module": "Planning",
+ "name": "Planning Paper And Board",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

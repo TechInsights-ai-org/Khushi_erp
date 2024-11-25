@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Planning Cost Manager",
+    "owner": "Administrator",
+    "creation": "2024-11-24 14:10:16.081614",
+    "modified": "2024-11-24 14:10:16.081614",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "role_name": "Planning Cost Manager",
+    "disabled": 0,
+    "is_custom": 0,
+    "desk_access": 1,
+    "two_factor_auth": 0,
+    "doctype": "Role",
+    "__last_sync_on": "2024-11-24T08:40:34.746Z"
+  },
+  {
+    "name": "Report User",
+    "owner": "Administrator",
+    "creation": "2024-11-20 18:46:04.717125",
+    "modified": "2024-11-20 18:46:04.717125",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "role_name": "Report User",
+    "disabled": 0,
+    "is_custom": 0,
+    "desk_access": 1,
+    "two_factor_auth": 0,
+    "search_bar": 1,
+    "notifications": 1,
+    "list_sidebar": 1,
+    "bulk_actions": 1,
+    "view_switcher": 1,
+    "form_sidebar": 1,
+    "timeline": 1,
+    "dashboard": 1,
+    "doctype": "Role",
+    "__last_sync_on": "2024-11-24T08:46:40.877Z"
+  }
+]

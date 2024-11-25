@@ -244,6 +244,7 @@ app_license = "mit"
 
 fixtures = [
     "Custom Field",
-    "Comparison Type"
+    "Comparison Type",
+    "Role"
 ]
 
