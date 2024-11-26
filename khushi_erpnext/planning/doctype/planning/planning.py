@@ -9,10 +9,11 @@ class Planning(Document):
 	def update_total_output(self) -> None:
 		""" Calculates the total quantity (output) """
 		if float(self.packing) == 0:
+			self.output = 0
 			return
 		total_output_without_wastage = (float(self.total_sheets) * float(self.ups)) / float(self.packing)
 		total_wastage = total_output_without_wastage * (float(self.wastage) / 100)
-		self.total_qnty = total_output_without_wastage - total_wastage
+		self.output = total_output_without_wastage - total_wastage
 
 
 	def get_costing_value(self,field: str, fc:bool = False , vc:bool = False) -> float | int:
@@ -54,12 +55,12 @@ class Planning(Document):
 
 	def update_cost_details(self):
 		""" Updates the value for the fields that are in cost details Tab """
-		if self.total_qnty == 0 or self.total_qnty is None:
+		if self.output == 0 or self.output is None:
 			return
-		self.cost_with_gst: float = self.total_investment_with_gst / self.total_qnty
-		self.cost_without_gst: float = self.total_investment_bef_gst / self.total_qnty
-		self.fix_cost_with_gst: float = self.fix_cost_with_tax / self.total_qnty
-		self.fix_cost_without_gst:  float = self.fix_cost_bef_tax / self.total_qnty
+		self.cost_with_gst: float = self.total_investment_with_gst / self.output
+		self.cost_without_gst: float = self.total_investment_bef_gst / self.output
+		self.fix_cost_with_gst: float = self.fix_cost_with_tax / self.output
+		self.fix_cost_without_gst:  float = self.fix_cost_bef_tax / self.output
 
 	def update_cost_table(self):
 		"""Updates the costing sub-details child table"""
@@ -83,11 +84,22 @@ class Planning(Document):
 					cost_data.gst_amount = 0
 				cost_data.total_amt: float = cost_data.amt_bef_tax + cost_data.gst_amount
 
+	def update_investment_and_cost_details(self):
+		self.update_investment()
+		self.update_cost_details()
+
 	def before_save(self):
 		self.update_cost_table()
 		self.update_total_output()
-		self.update_investment()
-		self.update_cost_details()
+		self.update_investment_and_cost_details()
+
+
+	@frappe.whitelist()
+	def on_costing_change(self):
+		self.update_cost_table()
+		self.update_investment_and_cost_details()
+
+
 
 
 

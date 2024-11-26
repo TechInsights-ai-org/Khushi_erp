@@ -72,6 +72,7 @@
   },
   {
    "columns": 6,
+   "default": "1.00",
    "fieldname": "s1",
    "fieldtype": "Float",
    "label": "S1",
@@ -79,6 +80,7 @@
   },
   {
    "columns": 7,
+   "default": "1.00",
    "fieldname": "s2",
    "fieldtype": "Float",
    "label": "S2",
@@ -106,6 +108,7 @@
    "precision": "0"
   },
   {
+   "default": "18%",
    "fieldname": "gst",
    "fieldtype": "Select",
    "label": "GST %",
@@ -135,7 +138,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-26 22:02:25.702263",
+ "modified": "2024-11-26 23:31:37.218944",
  "modified_by": "Administrator",
  "module": "Planning",
  "name": "Costing Child",

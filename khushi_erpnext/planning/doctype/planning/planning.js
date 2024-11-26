@@ -7,5 +7,17 @@ frappe.ui.form.on("Planning", {
 	},
 
 });
+frappe.ui.form.on("Costing Child", {
+    count: function(frm, cdt, cdn) {
+        var child = locals[cdt][cdn];
+        frm.call({
+            doc: frm.doc,
+            method: "on_costing_change",
+            freeze: true,
+            callback: function (r) {
+            }
+        })
+    }
+});
 
 
