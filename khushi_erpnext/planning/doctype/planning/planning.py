@@ -83,11 +83,22 @@ class Planning(Document):
 					cost_data.gst_amount = 0
 				cost_data.total_amt: float = cost_data.amt_bef_tax + cost_data.gst_amount
 
+	def update_investment_and_cost_details(self):
+		self.update_investment()
+		self.update_cost_details()
+
 	def before_save(self):
 		self.update_cost_table()
 		self.update_total_output()
-		self.update_investment()
-		self.update_cost_details()
+		self.update_investment_and_cost_details()
+
+
+	@frappe.whitelist()
+	def on_costing_change(self):
+		self.update_cost_table()
+		self.update_investment_and_cost_details()
+
+
 
 
 
