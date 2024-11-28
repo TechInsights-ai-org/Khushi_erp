@@ -101,6 +101,7 @@ def get_po_balance(item_code: str) -> float:
 
 
 def append_balance(func, data: list[list], *args):
+    func.clear_cache()
     for row in data:
         row.append(func(row[4], *args) if args else func(row[4]))
     return data
