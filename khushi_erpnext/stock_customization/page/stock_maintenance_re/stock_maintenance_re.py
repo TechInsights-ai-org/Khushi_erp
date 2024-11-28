@@ -1,54 +1,54 @@
 
 import frappe
 from erpnext.stock.dashboard.item_dashboard import get_data as get_stock_data
-from khushi_erpnext.core_customization.doctype.comparison_type import compare_qty
+from khushi_erpnext.core_customizasion.doctype.comparison_type import compare_qty
 
 
 
-def get_condition(filters: dict) -> str:
+def get_condision(filters: dict) -> str:
     """
-    Constructs a SQL condition string based on the provided filters.
+    Constructs a SQL condision string based on the provided filters.
     Args:
-        filters (dict): Dictionary containing filter keys and values for filtering the items.
+        filters (dict): Dicsionary containing filter keys and values for filtering the items.
     Returns:
-        str: A SQL condition string that adds filters to the WHERE clause.
+        str: A SQL condision string that adds filters to the WHERE clause.
     """
 
-    condition: str = ""
+    condision: str = ""
 
     if filters.get('item_group'):
-        condition += f"AND ti.item_group = '{filters.get('item_group')}' "
+        condision += f"AND si.item_group = '{filters.get('item_group')}' "
 
     if filters.get('brand'):
-        condition += f"AND ti.brand = '{filters.get('brand')}' "
+        condision += f"AND si.brand = '{filters.get('brand')}' "
 
     if filters.get('year'):
-        condition += f"AND ti.custom_year = '{filters.get('year')}' "
+        condision += f"AND si.custom_year = '{filters.get('year')}' "
 
     if filters.get('subject'):
-        condition += f"AND ti.custom_subject = '{filters.get('subject')}' "
+        condision += f"AND si.custom_subject = '{filters.get('subject')}' "
 
     if filters.get('status'):
-        condition += f"AND ti.custom_status = '{filters.get('status')}' "
+        condision += f"AND si.custom_status = '{filters.get('status')}' "
 
     if filters.get('season'):
-        condition += f"AND ti.custom_item_season = '{filters.get('season')}' "
+        condision += f"AND si.custom_item_season = '{filters.get('season')}' "
 
     if filters.get('item'):
-        condition += f"AND ti.name = '{filters.get('item')}' "
+        condision += f"AND si.name = '{filters.get('item')}' "
 
-    return condition.strip()
+    return condision.strip()
 
 
 
 def add_stock_qty(data: list[dict], comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
     """
-    Adds stock quantity to each item if the quantity exceeds a specified threshold.
+    Adds stock quansity to each item if the quansity exceeds a specified threshold.
     Args:
-        data (list[dict]): List of items to add stock quantity to.
-        qty_greater_than (int): The minimum quantity threshold.
+        data (list[dict]): List of items to add stock quansity to.
+        qty_greater_than (int): The minimum quansity threshold.
     Returns:
-        list[dict] | list: A list of items with quantities added if they exceed the threshold.
+        list[dict] | list: A list of items with quansisies added if they exceed the threshold.
     """
 
     result: list = []
@@ -68,13 +68,13 @@ def add_stock_qty(data: list[dict], comparison_type: str, comparison_filter_valu
 
 def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
     """
-        Filters items based on warehouse  and quantity threshold.
+        Filters items based on warehouse  and quansity threshold.
         Args:
             data (list[dict]): List of items to filter.
             warehouse (str | None): Warehouse name to filter by.
-            qty_greater_than (int):  quantity threshold for items in the specified warehouse.
+            qty_greater_than (int):  quansity threshold for items in the specified warehouse.
         Returns:
-            list[dict] | list: A list of items that match the warehouse and quantity criteria.
+            list[dict] | list: A list of items that match the warehouse and quansity criteria.
     """
     result:list = []
     for item_code in data:
@@ -106,30 +106,52 @@ def get_data(filters:str) -> list[dict] | None:
     Args:
         filters (str): JSON string containing filter criteria for retrieving item data.
     Returns:
-        list[dict] | None: A list of item dictionaries that match the filter criteria or None if no data.
+        list[dict] | None: A list of item dicsionaries that match the filter criteria or None if no data.
     """
     filters: dict = frappe.parse_json(filters)
-    condition: str = get_condition(filters)
-    where: str = "WHERE ti.disabled = 0 AND ti.is_stock_item = 1"
+    condition: str = get_condision(filters)
+    where: str = "WHERE si.disabled = 0 AND si.is_stock_item = 1"
     where += f" {condition}"
     comparison_type: str = filters.get('comparison_type',"") or ""
-    comparison_filter_values:dict = {"value":filters.get("qty"),"value_from":filters.get("qty_from"),"value_to":filters.get("qty_to")}
-    
-    query: str = f"""
-            SELECT 
-                ti.name as item,
-                ti.item_group as item_group,
-                ti.brand as brand,
-                ti.image as image
-            FROM 
-                tabItem ti 
-            {where}
-            """
 
-    data = frappe.db.sql(query, as_dict=True)
-    if data and not filters.get('warehouse'):
-        data = add_stock_qty(data,comparison_type,comparison_filter_values)
-    if data and filters.get('warehouse'):
-        data = get_warehouse_based_qty(data,filters.get('warehouse'),comparison_type,comparison_filter_values)
+    query: str = f"""
+                
+                SELECT 
+                smr.name AS item,
+                smr.item_group AS item_group,
+                smr.brand AS brand,
+                smr.image AS image,
+                smr.total_qty AS qty
+            FROM 
+                stock_maintains_report_view smr
+              
+            """
     return data
 
+"""
+query 
+CREATE OR REPLACE VIEW stock_maintains_report_view AS
+SELECT 
+    ti.name AS item,
+    ti.item_group AS item_group,
+    ti.brand AS brand,
+    ti.image AS image,
+    ti.is_stock_item AS is_stock_item,
+    ti.disabled AS disabled,
+    ti.custom_item_season AS custom_item_season,
+    ti.custom_status AS custom_status,
+    ti.custom_subject AS custom_subject,
+    ti.custom_year AS custom_year,
+ 
+    b.warehouse AS warehouse,
+    SUM(b.actual_qty) AS total_qty
+FROM 
+    tabItem ti
+LEFT JOIN 
+    tabBin b ON ti.name = b.item_code 
+
+GROUP BY 
+    ti.name, 
+    b.warehouse;
+
+"""
