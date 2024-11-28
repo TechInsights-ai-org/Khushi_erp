@@ -24,9 +24,6 @@ frappe.query_reports["Sales Order VS Stock Balance Report"] = {
 		if (column.id == "qty_to_deliver" && data["qty_to_deliver"] > data["stock_balance"] && data["qty_to_deliver"] < data["stock_balance"] + data["purchase_qty"]) {
 			value = "<span style='color:yellow!important;font-weight:bold'>" + value + "</span>";
 		}
-		if (column.id == "purchase_qty" && data["qty_to_deliver"] > data["stock_balance"] && data["qty_to_deliver"] < data["stock_balance"] + data["purchase_qty"]) {
-			value = "<span style='color:red!important;font-weight:bold'>" + value + "</span>";
-		}
 		return value;
     }
 };
