@@ -24,7 +24,6 @@ def get_columns() -> list[dict]:
 
 
 def get_condition(filters: dict) -> str:
-    "Need to return condition based on the filter the give"
     cond: str = "WHERE so.status <> 'Cancelled'"
     company: str = filters.get("company", "")
     f_date: "str" = filters.get("f_date", "")
