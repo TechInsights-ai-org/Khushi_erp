@@ -83,7 +83,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "khushi_erpnext.install.before_install"
-# after_install = "khushi_erpnext.install.after_install"
+after_install = "khushi_erpnext.after_install.after_install_executor.execute"
 
 # Uninstallation
 # ------------
