@@ -1,5 +1,4 @@
 let previous_comparison_type = null;
-
 frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
@@ -7,7 +6,6 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         single_column: true
     });
 
-    // Create Filter Section
     let filter_fields = [
         {fieldname: "warehouse", label: "Warehouse", fieldtype: "Link", options: 'Warehouse'},
         {fieldname: "item_group", label: "Item Group", fieldtype: "Link", options: "Item Group"},
@@ -20,21 +18,28 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         {fieldname: "comparison_type", label: "Comparison Type", fieldtype: "Link", options: "Comparison Type"},
         {fieldname: "qty", label: "Qty", fieldtype: "Int"},
         {fieldname: "qty_from", label: "Qty From", fieldtype: "Int"},
-        {fieldname: "qty_to", label: "Qty To", fieldtype: "Int"}
+        {fieldname: "qty_to", label: "Qty To", fieldtype: "Int"},
+        { fieldname: "page_size", label: "Page Size", fieldtype: "Select", options: [150, 250, 500, 2500, "All"] , default:150 }
     ];
 
     // Initialize Filters
-    filter_fields.forEach(function (field) {
-        page.add_field({
-            fieldname: field.fieldname,
-            label: field.label,
-            fieldtype: field.fieldtype,
-            options: field.options || '',
-            change: function () {
-                update_dashboard();
-            }
+        filter_fields.forEach(function(field) {
+            let previous_value = null;
+            page.add_field({
+                fieldname: field.fieldname,
+                label: field.label,
+                fieldtype: field.fieldtype,
+                default: field.default || '',
+                options: field.options || '',
+                change: function() {
+                    const current_value = page.fields_dict[field.fieldname].get_value();
+                    if (current_value !== previous_value) {
+                        previous_value = current_value;
+                        update_dashboard();
+                    }
+                }
+            });
         });
-    });
 
     // Create the grid container
     let grid_container = $('<div></div>').css({
@@ -85,9 +90,11 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 args: {
                     filters: filters,
                 },
+                freeze: true,
+                freeze_message: "Loading",
                 callback: function (r) {
                     grid_container.empty();
-                    display_report_data(r.message);
+                    display_report_data(r.message[0],r.message[1]);
                 }
             });
     }
@@ -106,7 +113,8 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
             comparison_type: page.fields_dict.comparison_type.get_value(),
             qty: page.fields_dict.qty ? page.fields_dict.qty.get_value() : null,
             qty_from: page.fields_dict.qty_from ? page.fields_dict.qty_from.get_value() : null,
-            qty_to: page.fields_dict.qty_to ? page.fields_dict.qty_to.get_value() : null
+            qty_to: page.fields_dict.qty_to ? page.fields_dict.qty_to.get_value() : null,
+            page_limit: page.fields_dict.page_size.get_value()
         };
         return filters
 
@@ -117,7 +125,8 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
         let filters = reset_quantity_fields_and_return_updated_filters()
         toggle_display_by_filters(filters)
         if (filters.comparison_type) {
-            if(filters.qty || filters.qty === 0 ||  ((filters.qty_from || filters.qty_from === 0 && filters.qty_to))){
+            if(filters.qty !== null ||  ((filters.qty_from !==null && filters.qty_to !== null))){
+                page.wrapper.find('.loading-spinner').show();
                 get_data_and_display(filters)
             }
         }
@@ -127,17 +136,23 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
     }
 
 
-    // To rest the filters
+    // To reset the filters
     function reset_filters() {
         filter_fields.forEach(function (field) {
-            page.fields_dict[field.fieldname].set_value('');
+            if (field.fieldname === "page_size") {
+                page.fields_dict[field.fieldname].set_value(150);
+            } else {
+                page.fields_dict[field.fieldname].set_value('');
+            }
         });
         update_dashboard();
     }
+    // Add the Reset Filters button
     page.add_button('Reset Filters', reset_filters);
 
     //  To display report
-    function display_report_data(items) {
+    function display_report_data(items,total_count) {
+         page.set_indicator(`Total Count: ${total_count}`, 'green');
         if (!items || items.length === 0) {
         $('<div>No data found</div>')
             .css({
@@ -210,6 +225,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Item description
+
             $('<div></div>').text(`Item Group: ${item.item_group || 'N/A'}`)
                 .css({
                     fontSize: '12px',
