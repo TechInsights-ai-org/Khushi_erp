@@ -8,6 +8,7 @@ def build_where_clause(filters: dict) -> str:
     Returns:
         str: A SQL condition string that adds filters to the WHERE clause.
     """
+
     condition: str = ""
     if filters.get('item_group'):
         condition += f"AND smr.item_group = '{filters.get('item_group')}' "
@@ -41,7 +42,7 @@ def build_having_clause(filters: dict) -> str:
     """
     Constructs a SQL Having clause string based on the provided filters.
     Args:
-        filters (dict):  containing filter keys and values for filtering the items.
+        filters (dict): containing filter keys and values for filtering the items.
     Returns:
         str: A SQL condition string that adds filters to the Having clause.
     """

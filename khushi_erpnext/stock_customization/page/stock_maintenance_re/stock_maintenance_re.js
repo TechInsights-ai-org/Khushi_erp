@@ -225,6 +225,7 @@ frappe.pages['stock-maintenance-re'].on_page_load = function(wrapper) {
                 }).appendTo(item_div);
 
             // Item description
+
             $('<div></div>').text(`Item Group: ${item.item_group || 'N/A'}`)
                 .css({
                     fontSize: '12px',
