@@ -1,135 +1,147 @@
-
 import frappe
-from erpnext.stock.dashboard.item_dashboard import get_data as get_stock_data
-from khushi_erpnext.core_customization.doctype.comparison_type import compare_qty
 
 
-
-def get_condition(filters: dict) -> str:
+def build_where_clause(filters: dict) -> str:
     """
-    Constructs a SQL condition string based on the provided filters.
+    Constructs a SQL Where clause string based on the provided filters.
     Args:
-        filters (dict): Dictionary containing filter keys and values for filtering the items.
+        filters (dict):  containing filter keys and values for filtering the items.
     Returns:
         str: A SQL condition string that adds filters to the WHERE clause.
     """
 
     condition: str = ""
-
     if filters.get('item_group'):
-        condition += f"AND ti.item_group = '{filters.get('item_group')}' "
+        condition += f"AND smr.item_group = '{filters.get('item_group')}' "
 
     if filters.get('brand'):
-        condition += f"AND ti.brand = '{filters.get('brand')}' "
+        condition += f"AND smr.brand = '{filters.get('brand')}' "
 
     if filters.get('year'):
-        condition += f"AND ti.custom_year = '{filters.get('year')}' "
+        condition += f"AND smr.custom_year = '{filters.get('year')}' "
 
     if filters.get('subject'):
-        condition += f"AND ti.custom_subject = '{filters.get('subject')}' "
+        condition += f"AND smr.custom_subject = '{filters.get('subject')}' "
 
     if filters.get('status'):
-        condition += f"AND ti.custom_status = '{filters.get('status')}' "
+        condition += f"AND smr.custom_status = '{filters.get('status')}' "
 
     if filters.get('season'):
-        condition += f"AND ti.custom_item_season = '{filters.get('season')}' "
+        condition += f"AND smr.custom_item_season = '{filters.get('season')}' "
 
     if filters.get('item'):
-        condition += f"AND ti.name = '{filters.get('item')}' "
+        condition += f"AND smr.item = '{filters.get('item')}' "
 
-    return condition.strip()
+    if filters.get('warehouse'):
+        condition += f"AND smr.warehouse = '{filters.get('warehouse')}' "
+
+    where_clause: str = f"WHERE smr.disabled = 0 AND smr.is_stock_item = 1 {condition}"
+
+    return where_clause
 
 
-
-def add_stock_qty(data: list[dict], comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
+def build_having_clause(filters: dict) -> str:
     """
-    Adds stock quantity to each item if the quantity exceeds a specified threshold.
+    Constructs a SQL Having clause string based on the provided filters.
     Args:
-        data (list[dict]): List of items to add stock quantity to.
-        qty_greater_than (int): The minimum quantity threshold.
+        filters (dict): containing filter keys and values for filtering the items.
     Returns:
-        list[dict] | list: A list of items with quantities added if they exceed the threshold.
+        str: A SQL condition string that adds filters to the Having clause.
+    """
+    comparison_type: str | None = filters.get('comparison_type', None)
+    qty: int = filters.get('qty', 0)
+    having: str = ""
+    qty_field: str = "smr.total_qty " if filters.get('warehouse', None) else "SUM(smr.total_qty)"
+
+    if comparison_type:
+        if comparison_type == 'Between':
+            having += f"""HAVING {qty_field} BETWEEN {filters.get("qty_from", 0)} AND {filters.get("qty_to", 0)} """
+
+        elif comparison_type == 'Less than or Equal to':
+            having += f"HAVING {qty_field} <= {qty} "
+
+        elif comparison_type == 'Less than':
+            having += f"HAVING {qty_field} < {qty} "
+
+        elif comparison_type == 'Greater than or Equal to':
+            having += f"HAVING {qty_field} >= {qty} "
+
+        elif comparison_type == 'Greater than':
+            having += f"HAVING {qty_field} > {qty} "
+
+        elif comparison_type == 'Not Equals':
+            having += f"HAVING {qty_field} != {qty} "
+
+        elif comparison_type == 'Equals':
+            having += f"HAVING {qty_field} = {qty} "
+
+    return having
+
+
+def build_group_by_clause(filters: dict) -> str:
+    """
+    Constructs a SQL Group By clause string based on the provided filters.
+    Args:
+        filters (dict): Dicsionary containing filter keys and values for filtering the items.
+    Returns:
+        str: A SQL condition string that adds filters to the Group By clause.
     """
 
-    result: list = []
-    for item_code in data:
-        stock_data: list[dict] = get_stock_data(item_code.get('item'))
-        qty: int = 0
-        for stock in stock_data:
-            qty += stock.get('actual_qty')
-        item_code['qty'] = qty
-        if comparison_type:
-            if compare_qty(actual_qty=qty,comparison_type=comparison_type,filter_constraint_values=comparison_filter_values):
-                result.append(item_code)
-        else:
-            result.append(item_code)
-    return result
+    group_by: str = "" if filters.get('warehouse', None) else "GROUP BY smr.item"
+    return group_by
 
 
-def get_warehouse_based_qty(data:list[dict], warehouse: str|None ,comparison_type: str, comparison_filter_values: dict) -> list[dict] | list:
+def build_limit_clause(filters: dict) -> str:
+    page_size: str | int = filters.get('page_limit')
+    if page_size == "All":
+        return ""
+    else:
+        return f"LIMIT {page_size} "
+
+
+def get_query(filters: dict) -> str:
     """
-        Filters items based on warehouse  and quantity threshold.
-        Args:
-            data (list[dict]): List of items to filter.
-            warehouse (str | None): Warehouse name to filter by.
-            qty_greater_than (int):  quantity threshold for items in the specified warehouse.
-        Returns:
-            list[dict] | list: A list of items that match the warehouse and quantity criteria.
+    Constructs a SQL Query string based on the provided filters.
+    Args:
+        filters (dict): Dicsionary containing filter keys and values for filtering the items.
+    Returns:
+        str: Query
     """
-    result:list = []
-    for item_code in data:
-        stock_data = get_stock_data(item_code.get('item'))
-        for stock in stock_data:
-            stock_dict = {}
-            stock_dict['qty'] = stock.get('actual_qty')
-            stock_dict['warehouse'] = stock.get('warehouse')
-            stock_dict['item'] = item_code.get('item')
-            stock_dict['image'] = item_code.get('image')
-            stock_dict['item_group'] = item_code.get('item_group')
-            result.append(stock_dict)
+    qty_field: str = "smr.total_qty AS qty" if filters.get('warehouse', None) else "SUM(smr.total_qty) AS qty"
+    where: str = build_where_clause(filters)
+    group_by: str = build_group_by_clause(filters)
+    having: str = build_having_clause(filters)
+    limit: str = build_limit_clause(filters)
+    content_query: str = f"""
+                SELECT 
+                    smr.item AS item,
+                    smr.item_group AS item_group,
+                    smr.brand AS brand,
+                    smr.image AS image,
+                    {qty_field}
+                FROM 
+                    stock_maintains_report_view smr 
+                {where}
+                {group_by}
+                {having}
+                {limit}
+             """
 
-    warehouse_data: list = []
-    for data in result:
-        if data.get('warehouse') == warehouse:
-            if comparison_type:
-                if compare_qty(actual_qty=data.get('qty'),comparison_type=comparison_type,filter_constraint_values=comparison_filter_values):
-                    warehouse_data.append(data)
-            else:
-                warehouse_data.append(data)
-    return warehouse_data
+    total_count_query: str = f""" SELECT item as total FROM stock_maintains_report_view smr {where} {group_by} {having} """
+    return content_query, total_count_query
 
 
 @frappe.whitelist()
-def get_data(filters:str) -> list[dict] | None:
+def get_data(filters: str) -> tuple:
     """
     Retrieves item data based on specified filters.
     Args:
         filters (str): JSON string containing filter criteria for retrieving item data.
     Returns:
-        list[dict] | None: A list of item dictionaries that match the filter criteria or None if no data.
+        list[dict] | None: A list of item dict that match the filter criteria or None if no data.
     """
     filters: dict = frappe.parse_json(filters)
-    condition: str = get_condition(filters)
-    where: str = "WHERE ti.disabled = 0 AND ti.is_stock_item = 1"
-    where += f" {condition}"
-    comparison_type: str = filters.get('comparison_type',"") or ""
-    comparison_filter_values:dict = {"value":filters.get("qty"),"value_from":filters.get("qty_from"),"value_to":filters.get("qty_to")}
-    
-    query: str = f"""
-            SELECT 
-                ti.name as item,
-                ti.item_group as item_group,
-                ti.brand as brand,
-                ti.image as image
-            FROM 
-                tabItem ti 
-            {where}
-            """
-
-    data = frappe.db.sql(query, as_dict=True)
-    if data and not filters.get('warehouse'):
-        data = add_stock_qty(data,comparison_type,comparison_filter_values)
-    if data and filters.get('warehouse'):
-        data = get_warehouse_based_qty(data,filters.get('warehouse'),comparison_type,comparison_filter_values)
-    return data
-
+    content_query, total_count_query = get_query(filters)
+    data: list[dict] = frappe.db.sql(content_query, as_dict=True)
+    total_count: list = frappe.db.sql(total_count_query)
+    return data, len(total_count)
