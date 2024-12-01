@@ -1,14 +1,16 @@
 // Copyright (c) 2024, TechInsights and contributors
 // For license information, please see license.txt
-
 frappe.query_reports["Sales Order VS Stock Balance Report"] = {
 	"filters": [
 		{label: "Company", fieldname: "company", fieldtype: "Link", options: "Company"},
-		{label: "From Date", fieldname: "f_date", fieldtype: "Date"},
-		{label: "To Date", fieldname: "t_date", fieldtype: "Date"},
+		{label: "From Date", fieldname: "f_date", fieldtype: "Date",
+			default:erpnext.utils.get_fiscal_year(frappe.datetime.get_today(), with_dates = true)[1]},
+		{label: "To Date", fieldname: "t_date", fieldtype: "Date",
+			default:erpnext.utils.get_fiscal_year(frappe.datetime.get_today(), with_dates = true)[2]},
 		{label: "Sales Order", fieldname: "sales_order", fieldtype: "Link", options: "Sales Order"},
 		{label: "Warehouse", fieldname: "warehouse", fieldtype: "Link", options: 'Warehouse'},
-		{label: "Status", fieldname: "status", fieldtype: "MultiSelectList", options: [{value: "Draft", description:""},
+		{label: "Status", fieldname: "status", fieldtype: "MultiSelectList",
+			options: [{value: "Draft", description:""},
 				{value: "On Hold", description:""}, {value: "To Deliver and Bill", description:""},
 				{value: "To Bill", description:""}, {value: "To Deliver", description:""},
 				{value: "Completed", description:""}, {value: "Cancelled", description:""},
