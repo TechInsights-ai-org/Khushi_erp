@@ -31,7 +31,7 @@ def create_poiq_view():
 def create_scirq_view():
     query = """
            CREATE OR REPLACE
-            ALGORITHM = UNDEFINED VIEW `veuSubcontracting Item Receive Quantity` AS
+            ALGORITHM = UNDEFINED VIEW `veuSubcontracting Item Quantity to Receive` AS
             SELECT scoi.qty - scoi.received_qty as "subcontract_qty", scoi.item_code
             FROM `tabSubcontracting Order` AS sco
                      JOIN `tabSubcontracting Order Item` AS scoi ON sco.name = scoi.parent
