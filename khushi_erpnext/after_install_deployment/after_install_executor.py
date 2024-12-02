@@ -1,10 +1,12 @@
 from khushi_erpnext.after_install_deployment.stock_maintains_report_view import execute as stock_maintains_report_view_executor
 from khushi_erpnext.after_install_deployment.index_data import index_data
 from khushi_erpnext.after_install_deployment.index_creator import create_indexes_if_not_exists
+from khushi_erpnext.after_install_deployment.sales_order_vs_stock_balnce_view import execute as sales_order_vs_stock_balance_executor
 
 
 
 
 def execute():
     stock_maintains_report_view_executor()
+    sales_order_vs_stock_balance_executor()
     create_indexes_if_not_exists(index_data)
