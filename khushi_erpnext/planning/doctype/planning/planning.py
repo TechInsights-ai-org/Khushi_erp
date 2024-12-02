@@ -8,7 +8,7 @@ class Planning(Document):
 
 	def update_total_output(self) -> None:
 		""" Calculates the total quantity (output) """
-		if float(self.packing) == 0:
+		if not self.packing:
 			self.output = 0
 			return
 		total_output_without_wastage = (float(self.total_sheets) * float(self.ups)) / float(self.packing)
@@ -84,6 +84,16 @@ class Planning(Document):
 					cost_data.gst_amount = 0
 				cost_data.total_amt: float = cost_data.amt_bef_tax + cost_data.gst_amount
 
+	def update_roi(self):
+		if self.cost_without_gst != 0:
+			self.roi_without_tax: float = ((self.net_sales_rate_without_tax/self.cost_without_gst) - 1) * 100
+		if self.cost_with_gst != 0:
+			self.roi_with_tax: float = ((self.net_sales_rate_with_tax/self.cost_with_gst) -1) * 100
+		if self.net_sales_rate_with_tax:
+			self.ros_with_tax: float = (1 - (self.cost_with_gst/self.net_sales_rate_with_tax)) * 100
+		if self.net_sales_rate_without_tax:
+			self.ros_without_tax: float = (1 - (self.cost_without_gst/self.net_sales_rate_without_tax)) * 100
+
 	def update_investment_and_cost_details(self):
 		self.update_investment()
 		self.update_cost_details()
@@ -92,12 +102,14 @@ class Planning(Document):
 		self.update_cost_table()
 		self.update_total_output()
 		self.update_investment_and_cost_details()
+		self.update_roi()
 
 
 	@frappe.whitelist()
 	def on_costing_change(self):
 		self.update_cost_table()
 		self.update_investment_and_cost_details()
+		self.update_roi()
 
 
 
