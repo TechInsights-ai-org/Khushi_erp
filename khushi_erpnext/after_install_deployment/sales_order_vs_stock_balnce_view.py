@@ -17,8 +17,8 @@ def create_poiq_view():
     query = """
            CREATE OR REPLACE
             ALGORITHM = UNDEFINED VIEW `veuPurchase Order Item Quantity` AS 
-            SELECT CASE WHEN po.is_subcontracted = 1 THEN COALESCE(poi.fg_item_qty, 0) ELSE COALESCE(poi.qty, 0) END as "poi_qty",
-                  CASE WHEN po.is_subcontracted = 1 THEN poi.fg_item ELSE poi.item_code END as "item_code"
+            SELECT COALESCE(poi.qty, 0) AS "poi_qty",
+                  poi.item_code AS "item_code", po.supplier AS supplier
             FROM `tabPurchase Order` AS po
                  JOIN `tabPurchase Order Item` AS poi ON po.name = poi.parent
             WHERE po.status NOT IN ("To Bill", "Completed", "Cancelled", "Closed", "Delivered");
@@ -31,8 +31,8 @@ def create_poiq_view():
 def create_scirq_view():
     query = """
            CREATE OR REPLACE
-            ALGORITHM = UNDEFINED VIEW `veuSubcontracting Item Quantity to Receive` AS
-            SELECT scoi.qty - scoi.received_qty as "subcontract_qty", scoi.item_code
+            ALGORITHM = UNDEFINED VIEW `veuSubcontracting Item Quantity` AS
+            SELECT scoi.qty as "subcontract_qty", scoi.item_code, sco.supplier as jobber
             FROM `tabSubcontracting Order` AS sco
                      JOIN `tabSubcontracting Order Item` AS scoi ON sco.name = scoi.parent
             WHERE sco.status NOT IN ("Completed", "Cancelled", "Closed");
@@ -40,7 +40,6 @@ def create_scirq_view():
     frappe.db.sql(query)
     frappe.db.commit()
     print("----------------- View Created for Subcontracting Item Receive Quantity ------------------------ ")
-
 
 
 def execute():
